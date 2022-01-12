@@ -107,6 +107,8 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject randomColorBtnCross;
 	[SerializeField] GameObject randomColorPopup;
 	[SerializeField] Transform pauseObjParents;
+	[SerializeField] Slider resolutionsSlider;
+	[SerializeField] Slider resolutionsSliderWebGL;
  	[HideInInspector] public Camera mainCam;
 
 	[Space(20)]
@@ -1219,6 +1221,20 @@ public class GameManager : MonoBehaviour
 
 		if (id < 4) controlTypeDropdown.SetValueWithoutNotify(id);
 		controlTypeDropdownWebGL.SetValueWithoutNotify(id);
+	}
+
+	// TODO: check error 
+	public void ChangeResolution(float id) // !! id is 0-1, use slider
+	{
+		int realId = Math.RoundToInt(id * Screen.resolutions.length);
+
+		saveData.resolutionID = id;
+		SaveData.Save(saveData);
+
+		Screen.SetResolution(Screen.resolutions[realId])
+
+		resolutionsSlider.SetValue(id);
+		resolutionsSlider.SetValue(id);
 	}
 
 	/// <summary>

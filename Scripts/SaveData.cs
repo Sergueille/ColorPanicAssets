@@ -27,6 +27,7 @@ public class SaveData
 	public bool vibrationOn = true;
 	public ContolType controlType = ContolType.fingerDirection;
 	public ColorBtnsType buttonPosType = ColorBtnsType.left;
+	public float resolutionID = 1;
 
 	public Language language = Language.system;
 
