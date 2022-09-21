@@ -168,6 +168,9 @@ public class GameManager : MonoBehaviour
 
 	[HideInInspector] public RectTransform btnsRect;
 
+	// Used to hide the score in game, during rewind
+	private bool scoreVisible = true;
+
 	private void Awake()
 	{
 		instance = this;
@@ -311,7 +314,10 @@ public class GameManager : MonoBehaviour
 
 	private void Update()
 	{
-		scoreText.text = score.ToString();
+		if (scoreVisible)
+			scoreText.text = score.ToString();
+		else
+			scoreText.text = "";
 		pauseScoreText.text = score.ToString();
 
 		//delete growing shapes by grop of 3
@@ -450,7 +456,8 @@ public class GameManager : MonoBehaviour
 	{
 		gameCoroutines.ForEach((coroutine) => StopCoroutine(coroutine));
 		SwitchMenu("Ingame");
-		UpdateIngamePowerupBtn();
+		scoreVisible = false;
+        UpdateIngamePowerupBtn();
 		rewindText.SetActive(true);
 
 		// Random colors
@@ -495,8 +502,8 @@ public class GameManager : MonoBehaviour
 		maxWithoutColorChange = 0;
 		lastCoinAmount = 0;
 
-		//reset score and shape lists
-		scoreStartTime = Time.time;
+        //reset score and shape lists
+        scoreStartTime = Time.time;
 		scoreMultiplier = currentPowerup == 2 ? 1.3f : 1;
 		shapes.Clear();
 		readyToDestroy.Clear();
@@ -509,8 +516,9 @@ public class GameManager : MonoBehaviour
 
 		yield return new WaitForSeconds(1);
 
-		//play music
-		music.Play();
+        //play music
+        scoreVisible = true;
+        music.Play();
 		noise.Stop();
 
 		//Start to instantiate shapes

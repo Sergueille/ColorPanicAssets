@@ -8561,6 +8561,16 @@ MonoBehaviour:
     amount: 90
     difficulty: 2
     display: {fileID: 0}
+  - reward: 15
+    type: 0
+    amount: 40
+    difficulty: 3
+    display: {fileID: 0}
+  - reward: 20
+    type: 3
+    amount: 4
+    difficulty: 3
+    display: {fileID: 0}
   lastMove: 0
   lastColorChange: 0
   maxWithoutMove: 0
