@@ -7,12 +7,14 @@ public abstract class Shape : MonoBehaviour
 	public readonly DifficultyRange sizeSpeedRange = new DifficultyRange(
 		new Range(0.7f, 0.7f),
 		new Range(0.8f, 1.1f),
-		new Range(0.3f, 2)
+		new Range(0.3f, 2),
+		new Range(0.2f, 3)
 		);
 
 	public readonly DifficultyRange rotationSpeedRange = new DifficultyRange(
 		new Range(5, 20),
 		new Range(5, 20),
+		new Range(10, 30),
 		new Range(10, 30)
 		);
 

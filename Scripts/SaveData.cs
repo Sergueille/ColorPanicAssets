@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Xml.Serialization;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 /// <summary>
 /// Contains all the information to be saved, except objectives
@@ -14,8 +15,8 @@ public class SaveData
 	public int nbGames = 0;//nb of thimes the player played a game
 	public bool firstPowerup = true;//have the user already used a powerup? (for help message)
 
-    public int[] lastScores = new int[] { 0, 0, 0 };
-    public int[] bestScores = new int[] { 0, 0, 0 };
+    public int[] lastScores = new int[] { 0, 0, 0, 0 };
+    public int[] bestScores = new int[] { 0, 0, 0, 0 };
 
     public int money = 100;
 
@@ -50,8 +51,25 @@ public class SaveData
 			{
 				try
 				{
+					SaveData res = new XmlSerializer(typeof(SaveData)).Deserialize(stream) as SaveData;
 
-					return new XmlSerializer(typeof(SaveData)).Deserialize(stream) as SaveData;
+					// Make save compatible with new difficulty levels
+					if (res.lastScores.Length != GameManager.difficultyCount)
+					{
+                        int[] oldLastScores = res.lastScores;
+                        res.lastScores = new int[GameManager.difficultyCount];
+
+						for (int i = 0; i < oldLastScores.Length; i++)
+							res.lastScores[i] = oldLastScores[i];
+
+                        int[] oldBestScores = res.bestScores;
+                        res.bestScores = new int[GameManager.difficultyCount];
+
+                        for (int i = 0; i < oldBestScores.Length; i++)
+                            res.bestScores[i] = oldBestScores[i];
+                    }
+
+                    return res;
 				}
 				catch (System.Exception e)
 				{

@@ -27,12 +27,14 @@ public struct DifficultyRange
     public Range easy;
     public Range medium;
     public Range hard;
+	public Range veryHard;
 
-	public DifficultyRange(Range easy, Range medium, Range hard)
+	public DifficultyRange(Range easy, Range medium, Range hard, Range veryHard)
 	{
 		this.easy = easy;
 		this.medium = medium;
 		this.hard = hard;
+		this.veryHard = veryHard;
 	}
 
 	public float PickRandom()
@@ -42,6 +44,7 @@ public struct DifficultyRange
 			GameManager.difficulty.easy => easy.PickRandom(),
 			GameManager.difficulty.medium => medium.PickRandom(),
 			GameManager.difficulty.hard => hard.PickRandom(),
+			GameManager.difficulty.veryHard => veryHard.PickRandom(),
 			_ => easy.PickRandom(),
 		};
 	}

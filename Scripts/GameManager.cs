@@ -27,7 +27,8 @@ public class GameManager : MonoBehaviour
 
 	const float BORDER_COLLIDER_RADIUS = 0.5f;
 
-	[System.Serializable] public enum difficulty { easy, medium, hard };
+	[System.Serializable] public enum difficulty { easy, medium, hard, veryHard };
+	public const int difficultyCount = 4;
 
     public static GameManager instance;
 	public SaveData saveData;
@@ -656,9 +657,9 @@ public class GameManager : MonoBehaviour
 		blip.Play();
 
 		currentDifficulty = (difficulty)d;
-		difficultyBtns[0].color = new Color(0, 0, 0, 0);
-		difficultyBtns[1].color = new Color(0, 0, 0, 0);
-		difficultyBtns[2].color = new Color(0, 0, 0, 0);
+
+		for (int i = 0; i < difficultyBtns.Length; i++)
+			difficultyBtns[i].color = new Color(0, 0, 0, 0);
 
 		difficultyBtns[d].color = diffColors[d];
 
@@ -1229,7 +1230,7 @@ public class GameManager : MonoBehaviour
 	/// <param name="id">New value, between 0 and 1, USE A SLIDER</param>
 	public void ChangeResolution(float id)
 	{
-		int realId = Math.RoundToInt(id * Screen.resolutions.length);
+		int realId = Mathf.RoundToInt(id * Screen.resolutions.Length);
 
 		saveData.resolutionID = id;
 		SaveData.Save(saveData);
