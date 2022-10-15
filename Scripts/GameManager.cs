@@ -77,6 +77,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject tutoHand;
 	[SerializeField] GameObject tutoText;
 	[SerializeField] GameObject tutoBtnsInsructions;
+	[SerializeField] GameObject tutoBtnsInsructions2;
 	[SerializeField] CanvasGroup colorBtnsCanvas;
 	[SerializeField] AudioSource rewindSound;
 	[SerializeField] AudioSource music;
@@ -221,82 +222,26 @@ public class GameManager : MonoBehaviour
 
 		LoadObjs();
 
-		if (saveData.nbGames > 0)
+        MoveFrameColliders();
+
+        if (saveData.nbGames > 0)
 		{
 			player.SetActive(false);
-			gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
-			gameCoroutines.Add(StartCoroutine(instantiateShrinking()));
-			gameCoroutines.Add(StartCoroutine(instantiateCoins())); 
-		}
+            gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
+            gameCoroutines.Add(StartCoroutine(instantiateShrinking()));
+            gameCoroutines.Add(StartCoroutine(instantiateCoins()));
+        }
 		else
 		{
 			player.SetActive(true);
 			SwitchMenu("Ingame");
+			yield return Tutorial();
+		}        
 
-			////TUTORIAL
-
-			colorButtonsGroup.ForEach(el => el.SetActive(false));
-			colorBtnsCanvas.gameObject.SetActive(true);
-			colorBtnsCanvas.interactable = false;
-			colorBtnsCanvas.alpha = 0;
-
-			yield return new WaitForSeconds(3);
-
-			tutoHand.SetActive(true);
-			tutoHand.GetComponent<CanvasGroup>().alpha = 0;
-			LeanTween.alphaCanvas(tutoHand.GetComponent<CanvasGroup>(), 1, 0.3f);
-			var t = Time.time;
-
-			yield return new WaitUntil(() => lastMove > t);
-			yield return new WaitForSeconds(2);
-
-			LeanTween.alphaCanvas(tutoHand.GetComponent<CanvasGroup>(), 0, 0.3f);
-
-			yield return new WaitForSeconds(0.5f);
-			tutoHand.SetActive(false);
-
-
-
-			tutoText.SetActive(true);
-			tutoText.GetComponent<CanvasGroup>().alpha = 0;
-			LeanTween.alphaCanvas(tutoText.GetComponent<CanvasGroup>(), 1, 0.3f);
-
-			yield return new WaitForSeconds(5);
-
-			LeanTween.alphaCanvas(tutoText.GetComponent<CanvasGroup>(), 0, 0.3f);
-
-			yield return new WaitForSeconds(0.5f);
-			tutoText.SetActive(false);
-
-
-
-			tutoBtnsInsructions.SetActive(true);
-			tutoBtnsInsructions.GetComponent<CanvasGroup>().alpha = 0;
-			LeanTween.alphaCanvas(tutoBtnsInsructions.GetComponent<CanvasGroup>(), 1, 0.3f);
-
-			colorBtnsCanvas.interactable = true;
-			LeanTween.alphaCanvas(colorBtnsCanvas, 0.5f, 0.3f);
-
-			yield return new WaitUntil(() => lastColorChange > t);
-			yield return new WaitForSeconds(2);
-
-			LeanTween.alphaCanvas(tutoBtnsInsructions.GetComponent<CanvasGroup>(), 0, 0.3f);
-
-			yield return new WaitForSeconds(0.5f);
-			tutoBtnsInsructions.SetActive(false);
-
-			scoreStartTime = Time.time;
-			gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
-			gameCoroutines.Add(StartCoroutine(instantiateShrinking()));
-			gameCoroutines.Add(StartCoroutine(instantiateCoins()));
-		}
-
-		if (saveData.unlockedColors.Count == 0)
+        if (saveData.unlockedColors.Count == 0)
 		{
 			saveData.unlockedColors = defaultColors.ToList();
 		}
-
-		MoveFrameColliders();
 
 		yield return new WaitForEndOfFrame();
 
@@ -646,7 +591,7 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	IEnumerator TweenPP(bool rewind)
 	{
-		for (float t = 0; t < 1; t += Time.unscaledDeltaTime / PP_TRANS_TIME)
+        for (float t = 0; t < 1; t += Time.unscaledDeltaTime / PP_TRANS_TIME)
 		{
 			rewindPP.weight = rewind? t : 1- t;
 			yield return null;
@@ -1328,4 +1273,82 @@ public class GameManager : MonoBehaviour
 			|| instance.saveData.buttonPosType == ColorBtnsType.leftSpaced
 			|| instance.saveData.buttonPosType == ColorBtnsType.downLeft;
 	}
+
+	private IEnumerator Tutorial()
+	{
+		isInvincible = true;
+
+        // Diasable color buttons
+        colorButtonsGroup.ForEach(el => el.SetActive(false));
+        colorBtnsCanvas.gameObject.SetActive(true);
+        colorBtnsCanvas.interactable = false;
+        colorBtnsCanvas.alpha = 0;
+
+        yield return new WaitForSeconds(3);
+
+		// Show hand
+        tutoHand.SetActive(true);
+        tutoHand.GetComponent<CanvasGroup>().alpha = 0;
+        LeanTween.alphaCanvas(tutoHand.GetComponent<CanvasGroup>(), 1, 0.3f);
+        var t = Time.time;
+
+        yield return new WaitUntil(() => lastMove > t);
+        yield return new WaitForSeconds(2);
+
+		// Hide hand
+        LeanTween.alphaCanvas(tutoHand.GetComponent<CanvasGroup>(), 0, 0.3f);
+
+        yield return new WaitForSeconds(0.5f);
+        tutoHand.SetActive(false);
+
+
+		// Show color text
+        tutoText.SetActive(true);
+        tutoText.GetComponent<CanvasGroup>().alpha = 0;
+        LeanTween.alphaCanvas(tutoText.GetComponent<CanvasGroup>(), 1, 0.3f);
+
+        yield return new WaitForSeconds(5);
+
+        LeanTween.alphaCanvas(tutoText.GetComponent<CanvasGroup>(), 0, 0.3f);
+
+        yield return new WaitForSeconds(0.5f);
+        tutoText.SetActive(false);
+
+
+		// Show buttons instructions
+		player.GetComponent<PlayerController>().allowedColors = 0b010;
+        tutoBtnsInsructions.SetActive(true);
+        tutoBtnsInsructions.GetComponent<CanvasGroup>().alpha = 0;
+        LeanTween.alphaCanvas(tutoBtnsInsructions.GetComponent<CanvasGroup>(), 1, 0.3f);
+
+        colorBtnsCanvas.interactable = true;
+        LeanTween.alphaCanvas(colorBtnsCanvas, 0.5f, 0.3f);
+
+        yield return new WaitUntil(() => lastColorChange > t);
+        yield return new WaitForSeconds(2);
+
+        LeanTween.alphaCanvas(tutoBtnsInsructions.GetComponent<CanvasGroup>(), 0, 0.3f);
+        yield return new WaitForSeconds(0.5f);
+        tutoBtnsInsructions.SetActive(false);
+
+        // Show next buttons instructions
+        player.GetComponent<PlayerController>().allowedColors = 0b111;
+        tutoBtnsInsructions2.SetActive(true);
+        tutoBtnsInsructions2.GetComponent<CanvasGroup>().alpha = 0;
+        LeanTween.alphaCanvas(tutoBtnsInsructions2.GetComponent<CanvasGroup>(), 1, 0.3f);
+
+		// Start only growing
+        gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
+		isInvincible = false;
+
+        t = Time.time;
+        yield return new WaitUntil(() => lastColorChange > t);
+        yield return new WaitForSeconds(2);
+
+        LeanTween.alphaCanvas(tutoBtnsInsructions2.GetComponent<CanvasGroup>(), 0, 0.3f);
+        yield return new WaitForSeconds(0.5f);
+        tutoBtnsInsructions2.SetActive(false);
+
+        scoreStartTime = Time.time;
+    }
 }

@@ -17,6 +17,8 @@
 "resume","resume","reprendre","продолжить"
 "tuto move","Slide to move","Glissez pour bouger","Тяните чтобы двигаться"
 "tuto btn","Press these buttons to change your color","Appuyez sur ces boutons pour changer de couleur","Нажмите на эти кнопки чтобы изменить цвет"
+"tuto green","Try to become green!","Essayez de devenir vert!",""
+"tuto blue","Now, try to become blue to go in the green shape","Mainenant, devenez bleu pour pouvoir entrer dans la forme verte!",""
 "tuto dont touch","Do not touch anything that is the same color as yours","Ne touchez pas ce qui est de la même couleur que vous","Не прикасайтесь к тому же цвету что и вы"
 "use powerup","Press here to use the powerup","Appuyez ici pour utiliser le powerup","Нажмите здесь чтобы включить питание"
 "slow motion","Slow motion","Ralenti","Медленней"
@@ -32,7 +34,8 @@
 "reset","Reset the game","Réinitialiser le jeu","Перезагрузить игру"
 "change vibr","Activate/deactivate the vibrator","Activer/désactiver le vibreur","Включить/выключить вибратор"
 "move type","Displacement control:","Contrôle du déplacement :","Режим управления движением:",
-"volume","Volume:","Volume :","3вук"
+"volume","Volume:","Volume :","3вук:"
+"resolution","Resolution:","Résolution :",""
 "confirm reset","Are you sure you want to reset everything? This will exit the game.","Etes-vous sur de vouloir tout réinitialiser? Cela fermera le jeu.","Вы уверены что хотите перезапустить все? Это закроет игру."
 "yes","Yes","Oui","Да"
 "no","No","Non","Нет"

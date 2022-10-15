@@ -44,6 +44,11 @@ public class PlayerController : MonoBehaviour
 
 	ContactFilter2D contactFilter;
 
+	/// <summary>
+	/// Use to prevent specific color changes, used for tutorial
+	/// </summary>
+	public int allowedColors = 0b111;
+
 	private void Start()
 	{
 		Input.simulateMouseWithTouches = false;
@@ -58,8 +63,8 @@ public class PlayerController : MonoBehaviour
 
 	private void Update()
 	{
-		// Select joystick
-		GameObject joystick = GameManager.IsJoystickRight() ? joystickRight : joystickLeft;
+        // Select joystick
+        GameObject joystick = GameManager.IsJoystickRight() ? joystickRight : joystickLeft;
 
 		// Reset movement
 		if (GameManager.instance.saveData.controlType != ContolType.fingerDirection)
@@ -317,13 +322,26 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// Chech if player dies
-		if (IsTouchingWrongColor() || myRB.IsTouchingLayers(LayerMask.GetMask("ScreenBorder")))
+		bool touchingBoprder = myRB.IsTouchingLayers(LayerMask.GetMask("ScreenBorder"));
+		if (IsTouchingWrongColor() || touchingBoprder)
 		{
 			if (!GameManager.instance.isInvincible)
 			{
 				GameManager.instance.StopGame();
 				Instantiate(diePS, gameObject.transform.position, Quaternion.identity);
 			}
+			else if (touchingBoprder)
+            {
+                float screenYunit = GameManager.instance.mainCam.orthographicSize;
+                float screenXunit = screenYunit / Screen.height * Screen.width;
+
+				gameObject.transform.position = new Vector3
+				(
+					Mathf.Clamp(gameObject.transform.position.x, -screenXunit, screenXunit),
+					Mathf.Clamp(gameObject.transform.position.y, -screenYunit, screenYunit),
+                    gameObject.transform.position.z
+				);
+            }
 		}
 	}
 
@@ -339,6 +357,9 @@ public class PlayerController : MonoBehaviour
 	/// <param name="index">Color index from 0 to 2</param>
 	public void ChangeColor(int index)
 	{
+		if ((allowedColors & (int)Mathf.Pow(2, index)) == 0)
+			return;
+
 		currentColorID = index;
 		mySR.color = GameManager.instance.saveData.colors[currentColorID];
 		myTR.startColor = myTR.endColor = GameManager.instance.saveData.colors[currentColorID];
@@ -385,14 +406,16 @@ public class PlayerController : MonoBehaviour
 		return currentColorID == touch; //|| currentColorID == overlap;
 	}
 
-	private void OnCollisionEnter2D(Collision2D collision)
-	{
-		if (collision.gameObject.CompareTag("ScreenBorder"))
-		{
-			GameManager.instance.StopGame();
-			Instantiate(diePS, gameObject.transform.position, Quaternion.identity);
-		}
-	}
+	// Never called?
+	//private void OnCollisionEnter2D(Collision2D collision)
+	//{
+	//	if (collision.gameObject.CompareTag("ScreenBorder"))
+	//	{
+	//		Debug.Log("2");
+	//		GameManager.instance.StopGame();
+	//		Instantiate(diePS, gameObject.transform.position, Quaternion.identity);
+	//	}
+	//}
 
 	private bool IsTouchInFrobiddenRect(Vector2 pos)
 	{
