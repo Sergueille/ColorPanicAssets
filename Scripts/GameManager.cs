@@ -1339,7 +1339,8 @@ public class GameManager : MonoBehaviour
 
 		// Start only growing
         gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
-		isInvincible = false;
+        scoreStartTime = Time.time;
+        isInvincible = false;
 
         t = Time.time;
         yield return new WaitUntil(() => lastColorChange > t);
@@ -1348,7 +1349,5 @@ public class GameManager : MonoBehaviour
         LeanTween.alphaCanvas(tutoBtnsInsructions2.GetComponent<CanvasGroup>(), 0, 0.3f);
         yield return new WaitForSeconds(0.5f);
         tutoBtnsInsructions2.SetActive(false);
-
-        scoreStartTime = Time.time;
     }
 }

@@ -79,7 +79,8 @@ public class Objective
 				GameManager.difficulty.easy => LocalisationSystem.GetLocalisedText("easy").ToLower(),
 				GameManager.difficulty.medium => LocalisationSystem.GetLocalisedText("medium").ToLower(),
 				GameManager.difficulty.hard => LocalisationSystem.GetLocalisedText("hard").ToLower(),
-				_ => "[error]",
+				GameManager.difficulty.veryHard => LocalisationSystem.GetLocalisedText("very hard").ToLower(),
+				_ => "[Unknown]",
 			};
 
 			return type switch
