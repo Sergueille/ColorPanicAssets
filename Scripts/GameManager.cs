@@ -1,9 +1,7 @@
-using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using TMPro;
 using UnityEngine;
@@ -58,7 +56,7 @@ public class GameManager : MonoBehaviour
 
 	[SerializeField] TextMeshProUGUI scoreText;
 	[SerializeField] TextMeshProUGUI pauseScoreText;
-	public GameObject player;
+	public PlayerController player;
 	[SerializeField] TextMeshProUGUI lastScoreText;
 	[SerializeField] TextMeshProUGUI bestScoreText;
 	[SerializeField] PostProcessVolume rewindPP;
@@ -72,7 +70,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] Transform objDisplayParent;
 	[SerializeField] GameObject coinPrefab;
 	[SerializeField] Material displayMaterial;
-	[SerializeField] ImageColor[] themeImages;
+	[SerializeField] public List<ImageColor> themeImages;
 	[SerializeField] GameObject[] colorSelectBtns;
 	[SerializeField] GameObject tutoHand;
 	[SerializeField] GameObject tutoText;
@@ -126,6 +124,10 @@ public class GameManager : MonoBehaviour
 	[SerializeField] float cameraShakeDuration = 0.5f;
 	[SerializeField] float cameraShakeMoveAmpl = 0.2f;
 	[SerializeField] float cameraShakeAngleAmpl = 5;
+
+    [SerializeField] float cameraSmallShakeDuration = 0.2f;
+	[SerializeField] float cameraSmallShakeMoveAmpl = 0.1f;
+	[SerializeField] float cameraSmallShakeAngleAmpl = 1;
 
 	
 	[Space(20)]
@@ -192,7 +194,7 @@ public class GameManager : MonoBehaviour
 
 		if (saveData == null)
 		{
-			player.SetActive(false);
+			player.gameObject.SetActive(false);
 			ChangeLanguageAdvanced(Language.system, false, false);
 			SwitchMenu("CorruptedSave");
 
@@ -226,14 +228,14 @@ public class GameManager : MonoBehaviour
 
         if (saveData.nbGames > 0)
 		{
-			player.SetActive(false);
+			player.gameObject.SetActive(false);
             gameCoroutines.Add(StartCoroutine(instantiateGrowing()));
             gameCoroutines.Add(StartCoroutine(instantiateShrinking()));
             gameCoroutines.Add(StartCoroutine(instantiateCoins()));
         }
 		else
 		{
-			player.SetActive(true);
+			player.gameObject.SetActive(true);
 			SwitchMenu("Ingame");
 			yield return Tutorial();
 		}        
@@ -436,9 +438,9 @@ public class GameManager : MonoBehaviour
 		yield return new WaitForSeconds(Shape.REVERT_TIME + 0.5f);
 
 		//reset and active player
-		player.SetActive(true);
-		player.transform.position = Vector3.zero;
-		player.GetComponent<PlayerController>().ChangeColor(2);
+		player.gameObject.SetActive(true);
+		player.gameObject.transform.position = Vector3.zero;
+		player.ChangeColor(2);
 
 		//reset max time without move or color and coin amount
 		lastColorChange = Time.time;
@@ -480,7 +482,7 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	public void StopGame()
 	{
-		player.SetActive(false);
+		player.gameObject.SetActive(false);
 
 		StartCoroutine(CameraShake());
 
@@ -572,7 +574,7 @@ public class GameManager : MonoBehaviour
 			SwitchMenu("Pause");
 			music.Pause();
 			noise.Play();
-			player.GetComponent<PlayerController>().canMove = false;
+			player.canMove = false;
 			UpdatePauseObjs();
 		}
 		else
@@ -582,7 +584,7 @@ public class GameManager : MonoBehaviour
 			SwitchMenu("Ingame");
 			music.UnPause();
 			noise.Stop();
-			player.GetComponent<PlayerController>().canMove = true;
+			player.canMove = true;
 		}
 	}
 
@@ -636,18 +638,25 @@ public class GameManager : MonoBehaviour
 		screenRightCollider.transform.position = new Vector3(screenXunit, 0);
 	}
 
-	public IEnumerator CameraShake()
+	public IEnumerator CameraShake(bool small = false)
 	{
 #if UNITY_IOS || UNITY_ANDROID
-		if (saveData.vibrationOn) Handheld.Vibrate();
+		if (saveData.vibrationOn && !small) Handheld.Vibrate();
 # endif
 
-		for (float t = 0; t < cameraShakeDuration; t += Time.deltaTime)
+        float duration = small ? cameraSmallShakeDuration : cameraShakeDuration;
+        float moveAmplitude = small ? cameraSmallShakeMoveAmpl : cameraShakeMoveAmpl;
+        float angle = small ? cameraSmallShakeAngleAmpl : cameraShakeAngleAmpl;
+
+		for (float t = 0; t < duration; t += Time.deltaTime)
 		{
 			gameObject.transform.SetPositionAndRotation(
-				new Vector3(Random.Range(-cameraShakeMoveAmpl, cameraShakeMoveAmpl), 
-				Random.Range(-cameraShakeMoveAmpl, cameraShakeMoveAmpl), -10), Quaternion.Euler(0, 0, Random.Range(-cameraShakeAngleAmpl, cameraShakeAngleAmpl))
-				);
+				new Vector3(
+                    Random.Range(-moveAmplitude, moveAmplitude), 
+				    Random.Range(-moveAmplitude, moveAmplitude), -10
+                ), 
+                Quaternion.Euler(0, 0, Random.Range(-angle, angle))
+            );
 
 			yield return new WaitForEndOfFrame();
 		}
@@ -655,7 +664,7 @@ public class GameManager : MonoBehaviour
 		gameObject.transform.SetPositionAndRotation(
 			new Vector3(0, 0, -10),
 			Quaternion.identity
-			);
+        );
 	}
 
 	/// <summary>
@@ -1316,7 +1325,7 @@ public class GameManager : MonoBehaviour
 
 
 		// Show buttons instructions
-		player.GetComponent<PlayerController>().allowedColors = 0b010;
+		player.allowedColors = 0b010;
         tutoBtnsInsructions.SetActive(true);
         tutoBtnsInsructions.GetComponent<CanvasGroup>().alpha = 0;
         LeanTween.alphaCanvas(tutoBtnsInsructions.GetComponent<CanvasGroup>(), 1, 0.3f);
@@ -1332,7 +1341,7 @@ public class GameManager : MonoBehaviour
         tutoBtnsInsructions.SetActive(false);
 
         // Show next buttons instructions
-        player.GetComponent<PlayerController>().allowedColors = 0b111;
+        player.allowedColors = 0b111;
         tutoBtnsInsructions2.SetActive(true);
         tutoBtnsInsructions2.GetComponent<CanvasGroup>().alpha = 0;
         LeanTween.alphaCanvas(tutoBtnsInsructions2.GetComponent<CanvasGroup>(), 1, 0.3f);

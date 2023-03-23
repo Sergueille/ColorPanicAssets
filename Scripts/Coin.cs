@@ -9,6 +9,8 @@ public class Coin : MonoBehaviour
     [SerializeField] float duration;
     [SerializeField] float coinAlpha;
     [SerializeField] AudioSource coinSound;
+    [SerializeField] ParticleSystem touchParticles;
+    [SerializeField] float touchParticlesDuration;
     [SerializeField] Range pitchRange;
 
     // Start is called before the first frame update
@@ -34,6 +36,9 @@ public class Coin : MonoBehaviour
 	{
 		if (collision.gameObject.name == "Player")
 		{
+            StartCoroutine(GameManager.instance.CameraShake(true));
+            touchParticles.Play();
+
             LeanTween.alpha(gameObject, 0, fadeSpeed);
             LeanTween.scale(gameObject, new Vector3(0.7f, 0.7f), fadeSpeed);
             //GameManager.instance.money += coinValue;
@@ -42,7 +47,9 @@ public class Coin : MonoBehaviour
             coinSound.pitch = pitchRange.PickRandom();
             coinSound.Play();
 
-            yield return new WaitForSeconds(fadeSpeed);
+            yield return new WaitForSeconds(touchParticlesDuration);
+
+            touchParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
             Destroy(gameObject);
         }
