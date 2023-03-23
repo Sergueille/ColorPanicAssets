@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4465779f2b8597a4f8238cd62ebadc02
+guid: 214e4bf009da88647a1ad4fe5d09dee5
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -24,6 +24,7 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -33,8 +34,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 1
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -46,12 +47,12 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 142
+  spritePixelsToUnits: 512
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
-  spriteTessellationDetail: 0.4
+  spriteTessellationDetail: -1
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
@@ -88,19 +89,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Windows Store Apps
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 3
-    buildTarget: iPhone
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -135,42 +124,22 @@ TextureImporter:
     overridden: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites: []
-    outline:
-    - - {x: 56, y: -44}
-      - {x: 60, y: -39}
-      - {x: 64, y: -33}
-      - {x: 68, y: -23}
-      - {x: 71, y: -8}
-      - {x: 71, y: 8}
-      - {x: 69, y: 21}
-      - {x: 62, y: 36}
-      - {x: 55, y: 46}
-      - {x: 48, y: 53}
-      - {x: 41, y: 59}
-      - {x: 27, y: 67}
-      - {x: 9, y: 71}
-      - {x: -9, y: 71}
-      - {x: -24, y: 68}
-      - {x: -38, y: 61}
-      - {x: -47, y: 54}
-      - {x: -56, y: 45}
-      - {x: -63, y: 34}
-      - {x: -68, y: 22}
-      - {x: -71, y: 10}
-      - {x: -71, y: -9}
-      - {x: -68, y: -23}
-      - {x: -60, y: -40}
-      - {x: -51, y: -51}
-      - {x: -37, y: -61}
-      - {x: -23, y: -68}
-      - {x: -9, y: -71}
-      - {x: 9, y: -71}
-      - {x: 26, y: -67}
-      - {x: 38, y: -61}
-      - {x: 47, y: -54}
+    outline: []
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
@@ -180,6 +149,7 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable: {}
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

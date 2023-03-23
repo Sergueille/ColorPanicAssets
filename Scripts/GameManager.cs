@@ -174,6 +174,11 @@ public class GameManager : MonoBehaviour
 	// Used to hide the score in game, during rewind
 	private bool scoreVisible = true;
 
+    [Space(20)]
+
+    [SerializeField] private float preventObjSkippingDelay;
+    private bool shouldPreventObjSkipping = false;
+
 	private void Awake()
 	{
 		instance = this;
@@ -727,6 +732,8 @@ public class GameManager : MonoBehaviour
 	/// </summary>
 	public IEnumerator UpdateObjs()
 	{
+        shouldPreventObjSkipping = true;
+
 		yield return new WaitForSeconds(TIME_BTW_NEW_OBJ);
 
 		for (int i = 0; i < 3; i++)
@@ -758,6 +765,9 @@ public class GameManager : MonoBehaviour
 		maxWithoutMove = 0;
 
 		SaveObjs();
+
+        yield return new WaitForSeconds(preventObjSkippingDelay);
+        shouldPreventObjSkipping = false;
 	}
 
 	private void UpdatePauseObjs()
@@ -798,7 +808,7 @@ public class GameManager : MonoBehaviour
 		blip.pitch = pitchRange.PickRandom();
 		blip.Play();
 
-		if (skippingObjs)
+		if (skippingObjs || shouldPreventObjSkipping)
 			yield break;
 
 		if (skipObjPrice > money)
