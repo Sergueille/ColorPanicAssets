@@ -61,7 +61,10 @@ public class GameManager : MonoBehaviour
 	[SerializeField] TextMeshProUGUI bestScoreText;
 	[SerializeField] PostProcessVolume rewindPP;
 	[SerializeField] Image[] difficultyBtns;
+	[SerializeField] RectTransform[] difficultyBtnsRects;
 	[SerializeField] Color[] diffColors;
+	private bool updatedDifficultyButtons = false;
+	[SerializeField] float difficultyButtonAnimationDuration = 0.3f;
 	[SerializeField] RectTransform scoresLayout;
 	[SerializeField] GameObject rewindText;
 	[SerializeField] GameObject newBestScoreLabel;
@@ -179,6 +182,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float preventObjSkippingDelay;
     private bool shouldPreventObjSkipping = false;
 
+    [Space(20)]
+
+    [SerializeField] private Renderer startTransition;
+    [SerializeField] private float startTransitionDuration;
+
 	private void Awake()
 	{
 		instance = this;
@@ -189,11 +197,20 @@ public class GameManager : MonoBehaviour
 		localDropdowns = new List<DropdownLocalisation>();
 
 		mainCam = gameObject.GetComponent<Camera>();
+
+        startTransition.sharedMaterial.SetFloat("_Discard", 0);
 	}
 
 	private IEnumerator Start()
 	{
 		saveData = SaveData.Load();
+
+        LeanTween.value(startTransition.gameObject, 0, 1, startTransitionDuration).setEaseInOutExpo().setOnUpdate(value => {
+            startTransition.sharedMaterial.SetFloat("_Discard", value);
+        }).setOnComplete(() => {
+            startTransition.sharedMaterial.SetFloat("_Discard", 1);
+            Destroy(startTransition);
+        });
 
 		initMenus();
 
@@ -616,12 +633,34 @@ public class GameManager : MonoBehaviour
 		blip.pitch = pitchRange.PickRandom();
 		blip.Play();
 
+        if (!updatedDifficultyButtons) // Hide all buttons first time
+        {
+            for (int i = 0; i < difficultyBtns.Length; i++)
+            {
+                difficultyBtnsRects[i].anchorMin = new Vector2(0.5f, 0);
+                difficultyBtnsRects[i].anchorMax = new Vector2(0.5f, 1);
+                difficultyBtns[i].color = new Color(diffColors[i].r, diffColors[i].g, diffColors[i].b, 0);
+            }
+        }
+
+        if ((int)currentDifficulty != d || !updatedDifficultyButtons) // Animate buttons
+        {
+            int c = (int)currentDifficulty;
+            LeanTween.value(difficultyBtns[c].gameObject, 1, 0, difficultyButtonAnimationDuration).setEaseInOutExpo().setOnUpdate(value => {
+                difficultyBtnsRects[c].anchorMin = new Vector2(0.5f - value / 2, 0);
+                difficultyBtnsRects[c].anchorMax = new Vector2(0.5f + value / 2, 1);
+                difficultyBtns[c].color = new Color(diffColors[c].r, diffColors[c].g, diffColors[c].b, value);
+            });
+
+            LeanTween.value(difficultyBtns[d].gameObject, 0, 1, difficultyButtonAnimationDuration).setEaseInOutExpo().setOnUpdate(value => {
+                difficultyBtnsRects[d].anchorMin = new Vector2(0.5f - value / 2, 0);
+                difficultyBtnsRects[d].anchorMax = new Vector2(0.5f + value / 2, 1);
+                difficultyBtns[d].color = new Color(diffColors[d].r, diffColors[d].g, diffColors[d].b, value);
+            });
+        }
+
 		currentDifficulty = (difficulty)d;
-
-		for (int i = 0; i < difficultyBtns.Length; i++)
-			difficultyBtns[i].color = new Color(0, 0, 0, 0);
-
-		difficultyBtns[d].color = diffColors[d];
+        updatedDifficultyButtons = true;
 
 		//PlayerPrefs.SetInt("Difficulty", d);
 

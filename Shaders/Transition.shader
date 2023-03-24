@@ -6,6 +6,7 @@ Shader "Unlit/Test"
         _ColorB ("Color B", Color) = (.4, .4, .4, 1)
         _Size ("Size", Float) = 0
         _Shift ("Shift", Float) = 0
+        _Discard ("Discard", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -34,6 +35,7 @@ Shader "Unlit/Test"
             fixed4 _ColorB;
             float _Size;
             float _Shift;
+            float _Discard;
 
             v2f vert (appdata v)
             {
@@ -44,7 +46,10 @@ Shader "Unlit/Test"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float2 pos = float2((_ScreenParams.x - i.vertex.x / _ScreenParams.y) + _Shift, i.vertex.y / _ScreenParams.y + _Shift);
+                float2 pos = float2(((_ScreenParams.x / 2 - i.vertex.x) / _ScreenParams.y) + _Shift, i.vertex.y / _ScreenParams.y + _Shift);
+
+                if ((pos.x + pos.y) % _Size < _Size * _Discard) discard;
+
                 bool isA = (pos.x + pos.y) % _Size < _Size / 2;
                 return isA ? _ColorA : _ColorB;
             }
