@@ -187,6 +187,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Renderer startTransition;
     [SerializeField] private float startTransitionDuration;
 
+    private float averageDeltaTime = 0.00001f;
+    private int currentScreenResId = 0;
+    private float lastResChangeTime = 0;
+
+    public TextMeshProUGUI testText;
+
 	private void Awake()
 	{
 		instance = this;
@@ -296,7 +302,7 @@ public class GameManager : MonoBehaviour
 			{
 				var toDestroy = readyToDestroy.Dequeue();
 				shapes.Remove(toDestroy);
-				Destroy(toDestroy);
+				Destroy(toDestroy.gameObject);
 			}
 		}
 
@@ -306,6 +312,19 @@ public class GameManager : MonoBehaviour
 
 		if ((Time.time - lastColorChange) > maxWithoutColorChange) 
 			maxWithoutColorChange = Time.time - lastColorChange;
+
+        // Compute average framerate
+        averageDeltaTime += (Time.unscaledDeltaTime - averageDeltaTime) * 0.02f;
+        float fps = 1 / averageDeltaTime;
+
+        if (fps < 20 && Time.unscaledDeltaTime - lastResChangeTime > 10 && currentScreenResId < Screen.resolutions.Length - 1)
+        {
+            currentScreenResId++;
+            lastResChangeTime = Time.unscaledTime;
+            Screen.SetResolution(Screen.resolutions[currentScreenResId].width, Screen.resolutions[currentScreenResId].height, true);
+        }
+
+        testText.text = fps +  "; " + currentScreenResId;
 	}
 
 	/// <summary>

@@ -13,6 +13,8 @@ public class Coin : MonoBehaviour
     [SerializeField] float touchParticlesDuration;
     [SerializeField] Range pitchRange;
 
+    private bool isAnimating = false;
+
     // Start is called before the first frame update
     IEnumerator Start()
     {
@@ -23,7 +25,9 @@ public class Coin : MonoBehaviour
 
         LeanTween.alpha(gameObject, 0, fadeSpeed);
         yield return new WaitForSeconds(fadeSpeed);
-        Destroy(gameObject);
+
+        if (!isAnimating) // Objet will be destroyed later in OnTriggerEnter2D function
+            Destroy(gameObject);
     }
 
     // Update is called once per frame
@@ -46,6 +50,8 @@ public class Coin : MonoBehaviour
 
             coinSound.pitch = pitchRange.PickRandom();
             coinSound.Play();
+
+            isAnimating = true;
 
             yield return new WaitForSeconds(touchParticlesDuration);
 
