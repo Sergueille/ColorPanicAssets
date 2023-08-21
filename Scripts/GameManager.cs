@@ -110,7 +110,7 @@ public class GameManager : MonoBehaviour
 	[SerializeField] GameObject randomColorBtnCross;
 	[SerializeField] GameObject randomColorPopup;
 	[SerializeField] Transform pauseObjParents;
-	[SerializeField] Slider resolutionsSlider;
+	[SerializeField] TMP_Dropdown resolutionDropdown;
  	[HideInInspector] public Camera mainCam;
 
 	[Space(20)]
@@ -152,6 +152,9 @@ public class GameManager : MonoBehaviour
 	private bool skippingObjs = false;
 	[HideInInspector] public bool mustIgnoreCorruptedSave = false;
 
+    [SerializeField] private float[] downscaleFactors = new float[]{ 1, 1.33f, 1.5f, 2, 3, 4 };
+    [SerializeField] private string[] downscaleFactorsTexts = new string[]{ "native", "3/4", "2/3", "1/2", "1/3", "1/4" };
+
 	public Objective[] objTemplate;
 
 	[HideInInspector] public float lastMove;//last time player moved
@@ -188,10 +191,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float startTransitionDuration;
 
     private float averageDeltaTime = 0.00001f;
-    private int currentScreenResId = 0;
-    private float lastResChangeTime = 0;
 
-    public TextMeshProUGUI testText;
+    // public TextMeshProUGUI testText;
 
 	private void Awake()
 	{
@@ -278,6 +279,8 @@ public class GameManager : MonoBehaviour
 		SetVolume(saveData.soundsVolume);
 		SetControlType((int)saveData.controlType);
 		ChangeColorBtnsPosition((int)saveData.buttonPosType);
+        ChangeResolution(saveData.downscaleFactorId);
+        SetupResolutionUI();
 
 		// Set coin rect
 		float screenXunit = mainCam.orthographicSize / Screen.height * Screen.width;
@@ -314,17 +317,10 @@ public class GameManager : MonoBehaviour
 			maxWithoutColorChange = Time.time - lastColorChange;
 
         // Compute average framerate
-        averageDeltaTime += (Time.unscaledDeltaTime - averageDeltaTime) * 0.02f;
-        float fps = 1 / averageDeltaTime;
+        // averageDeltaTime += (Time.unscaledDeltaTime - averageDeltaTime) * 0.02f;
+        // float fps = 1 / averageDeltaTime;
 
-        if (fps < 20 && Time.unscaledDeltaTime - lastResChangeTime > 10 && currentScreenResId < Screen.resolutions.Length - 1)
-        {
-            currentScreenResId++;
-            lastResChangeTime = Time.unscaledTime;
-            Screen.SetResolution(Screen.resolutions[currentScreenResId].width, Screen.resolutions[currentScreenResId].height, true);
-        }
-
-        testText.text = fps +  "; " + currentScreenResId;
+        // testText.text = fps.ToString();
 	}
 
 	/// <summary>
@@ -1208,6 +1204,12 @@ public class GameManager : MonoBehaviour
 		
 	public void OpenSettings()
 	{
+
+#if UNITY_EDITOR
+        SwitchMenu("Settings");
+        return;
+#endif
+
 		if (SystemInfo.deviceType == DeviceType.Desktop)
 			SwitchMenu("SettingsWebGL");
 		else SwitchMenu("Settings");
@@ -1253,25 +1255,34 @@ public class GameManager : MonoBehaviour
 		controlTypeDropdownWebGL.SetValueWithoutNotify(id);
 	}
 
-	// TODO: check for errors
 	/// <summary>
 	/// Sets the resolution, update UI, save setting
 	/// </summary>
-	/// <param name="id">New value, between 0 and 1, USE A SLIDER</param>
-	public void ChangeResolution(float id)
+	/// <param name="id">Resolution id btw 0 and downscaleFactors.Length</param>
+	public void ChangeResolution(int id)
 	{
-		int realId = Mathf.RoundToInt(id * Screen.resolutions.Length);
+        float fact = downscaleFactors[id];
+        saveData.downscaleFactorId = id;
 
-		saveData.resolutionID = id;
-		SaveData.Save(saveData);
+        Screen.SetResolution(
+            Mathf.RoundToInt(Screen.resolutions[0].width / fact), 
+            Mathf.RoundToInt(Screen.resolutions[0].height / fact), 
+            true);
 
-#if UNITY_IOS || UNITY_ANDROID
-		Resolution res = Screen.resolutions[realId];
-		Screen.SetResolution(res.width, res.height, true);
-#endif
-
-		resolutionsSlider.value = id;
+        SaveData.Save(saveData);
 	}
+
+    private void SetupResolutionUI()
+    {
+        List<string> options = new List<string> { LocalisationSystem.GetLocalisedText("resolution native") };
+
+        for (int i = 1; i < downscaleFactors.Length; i++)
+        {
+            options.Add(downscaleFactorsTexts[i]);
+        }
+
+        resolutionDropdown.AddOptions(options);
+    }
 
 	/// <summary>
 	/// Change game language
